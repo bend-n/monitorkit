@@ -1,0 +1,12 @@
+[package]
+name = "grapher"
+version = "1.0.0"
+edition = "2021"
+authors = ["bend-n <bend.n@outlook.com>"]
+repository = "https://github.com/bend-n/monitorkit"
+license = "MIT"
+rust-version = "1.85"
+
+[dependencies]
+anyhow = "1.0.97"
+termion = "4.0.4"
