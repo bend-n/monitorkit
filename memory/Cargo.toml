@@ -1,0 +1,18 @@
+[package]
+name = "memory"
+version = "1.0.0"
+edition = "2021"
+authors = ["bend-n <bend.n@outlook.com>"]
+repository = "https://github.com/bend-n/monitorkit"
+license = "MIT"
+rust-version = "1.85"
+
+[dependencies]
+anyhow = "1.0.97"
+atools = "0.1.6"
+collar = "1.0.1"
+comat = "0.1.3"
+parking_lot = "0.12.3"
+regex = "1.11.1"
+termion = "4.0.4"
+grapher = { path = "../grapher" }

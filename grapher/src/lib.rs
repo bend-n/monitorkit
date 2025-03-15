@@ -23,7 +23,7 @@ impl Grapher {
         self.data.pop_back();
     }
 
-    pub fn draw(&mut self, mut color: impl FnMut(u16) -> [u8; 3]) -> Result<&mut Vec<u8>> {
+    pub fn draw(&mut self, mut color: impl FnMut(u16) -> Option<[u8; 3]>) -> Result<&mut Vec<u8>> {
         let Grapher {
             buffer: output,
             data,
@@ -61,16 +61,11 @@ impl Grapher {
             })
             .collect::<Vec<_>>();
         assert_eq!(string.len(), w as usize);
-        write!(
-            output,
-            "\x1B[?7h{}{}{}",
-            clear::All,
-            Blue.fg_str(),
-            cursor::Goto(1, 1)
-        )?;
+        write!(output, "\x1B[?7h{}{}", clear::All, cursor::Goto(1, 1))?;
         for y in 0..h as usize {
-            let [r, g, b] = color(y as u16);
-            write!(output, "{}", Rgb(r, g, b).fg_string())?;
+            if let Some([r, g, b]) = color(y as u16) {
+                write!(output, "{}", Rgb(r, g, b).fg_string())?;
+            }
 
             for x in 0..w as usize {
                 output.extend(bl(string[x][y]));
