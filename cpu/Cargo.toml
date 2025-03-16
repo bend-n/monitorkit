@@ -16,3 +16,14 @@ parking_lot = "0.12.3"
 regex = "1.11.1"
 termion = "4.0.4"
 grapher = { path = "../grapher" }
+
+
+[[bin]]
+name = "cpu"
+doc = false
+path = "src/cpu.rs"
+
+[[bin]]
+name = "temps"
+doc = false
+path = "src/temps.rs"
