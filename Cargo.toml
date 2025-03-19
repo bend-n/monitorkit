@@ -1,5 +1,5 @@
 [workspace]
-members = ["cpu", "grapher", "memory"]
+members = ["cpu", "grapher", "memory","gpu"]
 resolver = "2"
 
 [profile.release]

@@ -83,7 +83,7 @@ fn braille(dots: [[bool; 4]; 2]) -> u8 {
     let x = simd_swizzle!(x, [0, 1, 2, /* */ 4, 5, 6, /* */ 3, 7]);
     x.simd_eq(Simd::splat(1)).to_bitmask() as u8
 }
-
+#[inline]
 fn bl(x: u8) -> [u8; 3] {
     let mut b = [0; 3];
     char::from_u32(0x2800 + x as u32)
