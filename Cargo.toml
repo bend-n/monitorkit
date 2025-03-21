@@ -1,6 +1,6 @@
 [workspace]
-members = ["cpu", "grapher", "memory","gpu"]
-resolver = "2"
+members = ["cpu", "grapher", "memory", "gpu", "battery"]
+resolver = "3"
 
 [profile.release]
 debug = 2

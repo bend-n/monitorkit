@@ -1,4 +1,11 @@
-#![feature(let_chains, iter_array_chunks, array_chunks, portable_simd, iter_chain)]
+#![feature(
+    let_chains,
+    iter_array_chunks,
+    array_chunks,
+    portable_simd,
+    iter_chain,
+    round_char_boundary
+)]
 use anyhow::Result;
 use std::collections::VecDeque;
 use std::io::Write;
@@ -6,6 +13,7 @@ use std::iter::zip;
 use std::simd::prelude::*;
 use termion::color::*;
 use termion::{clear, cursor};
+use unicode_width::*;
 
 pub struct Grapher {
     pub buffer: Vec<u8>,
@@ -90,4 +98,34 @@ fn bl(x: u8) -> [u8; 3] {
         .unwrap()
         .encode_utf8(&mut b);
     b
+}
+
+pub fn truncate_to(x: &str, cols: u16) -> String {
+    if x.width() < cols as _ {
+        return x.to_string();
+    }
+    let mut i = x.chars().scan(0, |length, x| {
+        *length += x.width().unwrap_or(0);
+        Some((x, *length))
+    });
+    use itertools::Itertools;
+    let mut o = i
+        .take_while_ref(|&(_, length)| length < cols as usize)
+        .map(|x| x.0)
+        .collect::<Vec<char>>();
+    if i.next().is_some() {
+        *o.last_mut().unwrap() = '…';
+    }
+    o.into_iter().collect::<String>()
+}
+
+pub fn truncate(x: &str) -> anyhow::Result<String> {
+    let columns = termion::terminal_size()?.0;
+    Ok(truncate_to(x, columns))
+}
+#[macro_export]
+macro_rules! truncwrite {
+    ($into:expr, $x:literal $(, $args:expr)* $(,)?) => {
+        $into.write(grapher::truncate(&format!($x $(, $args)*))?.as_bytes());
+    };
 }

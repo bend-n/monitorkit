@@ -1,7 +1,7 @@
 [package]
-name = "grapher"
+name = "battery"
 version = "1.0.0"
-edition = "2024"
+edition = "2021"
 authors = ["bend-n <bend.n@outlook.com>"]
 repository = "https://github.com/bend-n/monitorkit"
 license = "MIT"
@@ -9,6 +9,15 @@ rust-version = "1.85"
 
 [dependencies]
 anyhow = "1.0.97"
-itertools = "0.14.0"
+collar = "1.0.1"
+comat = "0.1.3"
+parking_lot = "0.12.3"
 termion = "4.0.4"
-unicode-width = "0.2.0"
+grapher = { path = "../grapher" }
+memchr = "2.7.4"
+
+
+[[bin]]
+name = "charge"
+doc = false
+path = "src/charge.rs"

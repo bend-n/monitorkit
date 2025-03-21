@@ -69,7 +69,6 @@ unsafe extern "C" {
     fn igt_devices_print(opts: *const igt_devices_print_format);
     fn igt_device_find_integrated_card(card: *mut igt_device_card) -> bool;
     fn igt_device_get_pretty_name(card: *const igt_device_card, numeric: bool) -> *const c_char;
-
 }
 
 fn uh() -> Result<()> {
