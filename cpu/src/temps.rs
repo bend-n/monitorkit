@@ -4,6 +4,7 @@ use comat::cwrite;
 use cpu::*;
 use grapher::Grapher;
 use std::array;
+use std::convert::identity;
 use std::io::Write;
 use std::io::{stdout, Read};
 use std::thread::sleep;
@@ -55,16 +56,19 @@ fn main() -> Result<()> {
             }
         }
 
-        g.draw(|y| {
-            Some(
-                inter(
-                    [228, 197, 63].map(|x| x as f32 / 255.0),     // yellow
-                    [0x5c, 0xc7, 0xdd].map(|x| x as f32 / 255.0), // blue
-                    y as f32 / (h - 1) as f32,
+        g.draw(
+            |y| {
+                Some(
+                    inter(
+                        [228, 197, 63].map(|x| x as f32 / 255.0),     // yellow
+                        [0x5c, 0xc7, 0xdd].map(|x| x as f32 / 255.0), // blue
+                        y as f32 / (h - 1) as f32,
+                    )
+                    .map(|x| (x * 255.0) as u8),
                 )
-                .map(|x| (x * 255.0) as u8),
-            )
-        })?;
+            },
+            identity,
+        )?;
 
         write!(g.buffer, "{}{}", White.fg_str(), cursor::Goto(1, 1))?;
         let name = &*info.name;

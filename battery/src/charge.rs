@@ -11,6 +11,7 @@
 use anyhow::*;
 use grapher::{truncwrite, Grapher};
 use std::array;
+use std::convert::identity;
 use std::fs::read_to_string as read;
 use std::io::Write;
 use std::io::{stdout, Read};
@@ -71,7 +72,7 @@ fn main() -> Result<()> {
             }
         }
 
-        g.draw(|_| None)?;
+        g.draw(|_| None, identity)?;
         let current = fetch("POWER_SUPPLY_CAPACITY", str::parse::<f64>)?;
         let whs = fetch("POWER_SUPPLY_ENERGY_NOW", str::parse::<f64>)? / 1e6;
         let usage = fetch("POWER_SUPPLY_POWER_NOW", str::parse::<f64>)? / 1e6;

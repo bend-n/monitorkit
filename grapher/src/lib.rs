@@ -31,7 +31,11 @@ impl Grapher {
         self.data.pop_back();
     }
 
-    pub fn draw(&mut self, mut color: impl FnMut(u16) -> Option<[u8; 3]>) -> Result<&mut Vec<u8>> {
+    pub fn draw(
+        &mut self,
+        mut color: impl FnMut(u16) -> Option<[u8; 3]>,
+        mut mapping: impl FnMut(f64) -> f64,
+    ) -> Result<&mut Vec<u8>> {
         let Grapher {
             buffer: output,
             data,
@@ -57,6 +61,7 @@ impl Grapher {
             .map(|column| {
                 let mut data = [vec![false; (h * 4) as usize], vec![false; (h * 4) as usize]];
                 for (e, c) in zip(column, &mut data) {
+                    let e = mapping(*e);
                     let clen = c.len();
                     c[clen - ((h as f64 * e * 4.0).round().min(h as f64 * 4.0) as usize)..]
                         .fill(true);

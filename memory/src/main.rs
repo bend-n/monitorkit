@@ -4,6 +4,7 @@ use comat::cwrite;
 use grapher::Grapher;
 use std::array;
 use std::collections::HashMap;
+use std::convert::identity;
 use std::fs::read_to_string as read;
 use std::io::Write;
 use std::io::{stdout, Read};
@@ -57,7 +58,7 @@ fn main() -> Result<()> {
         }
         let [tot, used] = info()?.map(|x| x as f64 / (1024. * 1024.));
         let tot = tot.round();
-        g.draw(|_| None)?;
+        g.draw(|_| None, identity)?;
 
         write!(g.buffer, "{}{}", White.fg_str(), cursor::Goto(1, 1))?;
         let fps = (1f32 / d).round();

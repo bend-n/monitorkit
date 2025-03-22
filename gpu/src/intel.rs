@@ -16,6 +16,7 @@ use comat::cwrite;
 use grapher::Grapher;
 use parking_lot::Mutex;
 use std::array;
+use std::convert::identity;
 use std::ffi::{c_char, CStr};
 use std::fmt::Display;
 use std::fs::{read_dir, read_to_string as read};
@@ -172,16 +173,19 @@ fn main() -> Result<()> {
             }
         }
 
-        g.draw(|y| {
-            Some(
-                inter(
-                    [243, 64, 64].map(|x| x as f32 / 255.0),  // red
-                    [228, 197, 63].map(|x| x as f32 / 255.0), // yellow
-                    y as f32 / (h - 1) as f32,
+        g.draw(
+            |y| {
+                Some(
+                    inter(
+                        [243, 64, 64].map(|x| x as f32 / 255.0),  // red
+                        [228, 197, 63].map(|x| x as f32 / 255.0), // yellow
+                        y as f32 / (h - 1) as f32,
+                    )
+                    .map(|x| (x * 255.0) as u8),
                 )
-                .map(|x| (x * 255.0) as u8),
-            )
-        })?;
+            },
+            identity,
+        )?;
 
         write!(g.buffer, "{}{}", White.fg_str(), cursor::Goto(1, 1))?;
         let [f_req, f_act, irq, _rc6, power_gpu, power_package, busy] = *last.lock();
