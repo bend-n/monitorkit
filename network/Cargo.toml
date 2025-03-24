@@ -1,5 +1,5 @@
 [package]
-name = "ping"
+name = "network"
 version = "1.0.0"
 edition = "2021"
 authors = ["bend-n <bend.n@outlook.com>"]
@@ -13,9 +13,17 @@ termion = "4.0.4"
 grapher = { path = "../grapher" }
 ping-rs = "0.1.2"
 oneshot = { version = "0.1.11", default-features = false, features = ["std"] }
+libc = "0.2.171"
+atools = "0.1.6"
+implicit-fn = "0.1.0"
 
 
 [[bin]]
 name = "ping"
 doc = false
 path = "src/ping.rs"
+
+[[bin]]
+name = "net"
+doc = false
+path = "src/net.rs"
