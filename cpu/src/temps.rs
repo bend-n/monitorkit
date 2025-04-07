@@ -2,7 +2,7 @@
 use anyhow::{ensure, Result};
 use comat::cwrite;
 use cpu::*;
-use grapher::Grapher;
+use grapher::{truncwrite, Grapher};
 use std::array;
 use std::convert::identity;
 use std::io::Write;
@@ -30,7 +30,7 @@ fn main() -> Result<()> {
         ViewCore::One(x) => ensure!(x < info.count, "not enough cores"),
         _ => (),
     }
-    let mut t = Temps::load()?;
+    let mut t = temps()?;
 
     let mut g = Grapher::new()?;
     g.push_point(t.read()? / 105.0);
@@ -75,10 +75,12 @@ fn main() -> Result<()> {
         let speed = speed()?;
         let temp = t.read()?;
         let fps = (1f32 / d).round();
-        cwrite!(
-            g.buffer,
-            " {fps}fps ──── {name} {core} @ {speed:.2} GHz ──── {red}{temp}{reset} °C",
-        )?;
+        let core = if !name.contains("Ryzen") {
+            core.to_string() + " "
+        } else {
+            "".to_string()
+        };
+        truncwrite!(g.buffer," {fps}fps ──── {name} {core}@ {speed:.2} GHz ──── \u{1b}[0;34;31m{temp:.0}\u{1b}[0m °C",)?;
         stdout.write_all(&g.buffer)?;
         stdout.flush()?;
 

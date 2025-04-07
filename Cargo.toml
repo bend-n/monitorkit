@@ -1,5 +1,14 @@
 [workspace]
-members = ["cpu", "grapher", "memory", "gpu", "battery", "network"]
+members = [
+    "hwmons",
+    "cpu",
+    "grapher",
+    "memory",
+    "gpu",
+    "battery",
+    "network",
+    "disk",
+]
 resolver = "3"
 
 [profile.release]

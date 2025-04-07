@@ -9,6 +9,7 @@
 use anyhow::*;
 use atools::prelude::*;
 use collar::CollectArray;
+use hwmons::{hwmons, Hwmon};
 use parking_lot::Mutex;
 use std::collections::HashMap;
 use std::fmt::Display;
@@ -42,46 +43,21 @@ pub struct CpuInfo {
     pub count: u64,
 }
 
-pub struct Temps(File);
-impl Temps {
-    pub fn load() -> Result<Self> {
-        for hwmon in std::fs::read_dir("/sys/class/hwmon/")?.filter_map(Result::ok) {
-            if !read(Path::join(&hwmon.path(), "name"))?.starts_with("coretemp") {
-                continue;
-            }
-            for f in std::fs::read_dir(hwmon.path())?.filter_map(Result::ok) {
-                if let Some(n) = f.file_name().to_str()
-                    && n.starts_with("temp")
-                    && n.ends_with("input")
-                {
-                    let i = n
-                        .bytes()
-                        .filter(u8::is_ascii_digit)
-                        .fold(0, |acc, x| acc * 10 + (x - b'0') as u64);
-
-                    let name = read(Path::join(&hwmon.path(), format!("temp{i}_label")))
-                        .context("alas")?;
-                    if let Some(c) = core() {
-                        if !name.contains(&c.to_string()) {
-                            continue;
-                        }
-                    } else if !name.contains("Package") {
-                        continue;
-                    }
-
-                    let f = File::open(f.path())?;
-                    return Ok(Self(f));
-                }
-            }
+#[implicit_fn::implicit_fn]
+pub fn temps() -> Result<Hwmon> {
+    if let x @ Some(_) = hwmons().find(_.contains("Package")) {
+        if let Some(c) = core() {
+            hwmons().find(_.contains(&c.to_string()))
+        } else {
+            x
         }
-        bail!("h")
+        .ok_or(anyhow!("no intel hwmon"))?
+    } else {
+        hwmons()
+            .find(_.contains("Tccd"))
+            .ok_or(anyhow!("no amd hwmon"))?
     }
-    pub fn read(&mut self) -> Result<f64> {
-        let mut o = String::default();
-        self.0.seek(std::io::SeekFrom::Start(0))?;
-        self.0.read_to_string(&mut o)?;
-        Ok(o.trim().parse::<f64>().context("reading temps")? / 1000.0)
-    }
+    .load()
 }
 
 impl CpuInfo {
@@ -98,21 +74,30 @@ impl CpuInfo {
             .lines()
             .filter_map(|l| l.split_once(":").map(|(a, b)| (a, b.trim())))
             .collect::<HashMap<_, _>>();
-        let name = x["Model name"]
-            .replace("Core", "")
-            .replace("(TM)", "")
-            .replace("Intel", "")
-            .replace("(R)", "");
-        let name = regex::Regex::new(r"@ [0-9]+\.[0-9]+GHz")
-            .unwrap()
-            .replace(&name, "");
-        let name = regex::Regex::new(r"[0-9]+th Gen")
-            .unwrap()
-            .replace(&name, "")
-            .replace("  ", " ")
-            .trim()
-            .replace("  ", " ")
-            .to_lowercase();
+        let name = x["Model name"];
+        let name = if name.contains("Intel") {
+            let name = name
+                .replace("Core", "")
+                .replace("(TM)", "")
+                .replace("Intel", "")
+                .replace("(R)", "");
+            let name = regex::Regex::new(r"[0-9]+th Gen")
+                .unwrap()
+                .replace(&name, "")
+                .replace("  ", " ")
+                .trim()
+                .replace("  ", " ");
+            regex::Regex::new(r"@ [0-9]+\.[0-9]+GHz")
+                .unwrap()
+                .replace(&name, "")
+                .to_lowercase()
+        } else {
+            name.replace("AMD Ryzen", "Ryzen")
+                .replace("Processor", "")
+                .trim()
+                .to_owned()
+        };
+
         Ok(Self {
             name: name,
             speed: x["CPU max MHz"].parse::<f64>().context("cpu mhz??")? / 1000.0,

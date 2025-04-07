@@ -1,7 +1,7 @@
 [package]
-name = "cpu"
+name = "disk"
 version = "1.0.0"
-edition = "2021"
+edition = "2024"
 authors = ["bend-n <bend.n@outlook.com>"]
 repository = "https://github.com/bend-n/monitorkit"
 license = "MIT"
@@ -9,23 +9,18 @@ rust-version = "1.85"
 
 [dependencies]
 anyhow = "1.0.97"
-atools = "0.1.6"
-collar = "1.0.1"
-comat = "0.1.3"
-parking_lot = "0.12.3"
-regex = "1.11.1"
 termion = "4.0.4"
 grapher = { path = "../grapher" }
-hwmons = { version = "1.0.0", path = "../hwmons" }
+ping-rs = "0.1.2"
+oneshot = { version = "0.1.11", default-features = false, features = ["std"] }
+libc = "0.2.171"
+atools = "0.1.6"
 implicit-fn = "0.1.0"
+collar = "1.0.1"
+human_bytes = "0.4.3"
 
 
 [[bin]]
-name = "cpu"
+name = "disk"
 doc = false
-path = "src/cpu.rs"
-
-[[bin]]
-name = "temps"
-doc = false
-path = "src/temps.rs"
+path = "src/disk.rs"

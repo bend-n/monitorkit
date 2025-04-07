@@ -104,7 +104,7 @@ fn bl(x: u8) -> [u8; 3] {
         .encode_utf8(&mut b);
     b
 }
-
+#[implicit_fn::implicit_fn]
 pub fn truncate_to(x: &str, cols: u16) -> String {
     if x.width() < cols as _ {
         return x.to_string();
@@ -114,14 +114,13 @@ pub fn truncate_to(x: &str, cols: u16) -> String {
         Some((x, *length))
     });
     use itertools::Itertools;
-    let mut o = i
-        .take_while_ref(|&(_, length)| length < cols as usize)
-        .map(|x| x.0)
+    let o = i
+        .take_while_ref(_.1 < cols as usize)
+        .map(_.0)
         .collect::<Vec<char>>();
-    if i.next().is_some() {
-        *o.last_mut().unwrap() = '…';
-    }
-    o.into_iter().collect::<String>()
+    o.into_iter()
+        .chain(i.next().map(|_| '…'))
+        .collect::<String>()
 }
 
 pub fn truncate(x: &str) -> anyhow::Result<String> {
