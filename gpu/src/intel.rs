@@ -72,19 +72,20 @@ unsafe extern "C" {
     fn igt_device_get_pretty_name(card: *const igt_device_card, numeric: bool) -> *const c_char;
 }
 
+#[implicit_fn::implicit_fn]
 fn uh() -> Result<()> {
     dbg!("???");
     let x = std::fs::read_dir("/sys/devices")?
         .filter_map(Result::ok)
-        .filter(|x| {
-            x.file_name()
+        .filter(
+            _.file_name()
                 .into_string()
-                .is_ok_and(|x| x.starts_with("pci"))
-        })
+                .is_ok_and(|x| x.starts_with("pci")),
+        )
         .filter_map(|x| read_dir(x.path()).ok())
         .flatten()
         .filter_map(Result::ok)
-        .find(|x| read(x.path().join("uevent")).is_ok_and(|x| x.contains("i915")))
+        .find(|x| read(x.path().join("uevent")).is_ok_and(_.contains("nvidia")))
         .ok_or(anyhow!("intelless"))?
         .path();
 
@@ -145,10 +146,6 @@ fn main() -> Result<()> {
             .unwrap()
     };
 
-    fn inter([a, b, c]: [f32; 3], [d, e, f]: [f32; 3], fc: f32) -> [f32; 3] {
-        [a + (d - a) * fc, b + (e - b) * fc, c + (f - c) * fc]
-    }
-
     let mut g = Grapher::new()?;
     sleep(Duration::from_secs_f32(0.5));
     if let std::result::Result::Ok(Some(_)) = c.try_wait() {
@@ -176,7 +173,7 @@ fn main() -> Result<()> {
         g.draw(
             |y| {
                 Some(
-                    inter(
+                    grapher::inter(
                         [243, 64, 64].map(|x| x as f32 / 255.0),  // red
                         [228, 197, 63].map(|x| x as f32 / 255.0), // yellow
                         y as f32 / (h - 1) as f32,

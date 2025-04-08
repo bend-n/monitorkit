@@ -16,9 +16,18 @@ parking_lot = "0.12.3"
 termion = "4.0.4"
 grapher = { path = "../grapher" }
 memchr = "2.7.4"
+implicit-fn = "0.1.0"
+nvml-wrapper = "0.10.0"
+pretty-bytes = "0.2.2"
 
 
 [[bin]]
 name = "intel"
 doc = false
 path = "src/intel.rs"
+
+
+[[bin]]
+name = "nvidia"
+doc = false
+path = "src/nvidia.rs"

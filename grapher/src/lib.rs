@@ -14,6 +14,9 @@ use std::simd::prelude::*;
 use termion::color::*;
 use termion::{clear, cursor};
 use unicode_width::*;
+pub fn inter([a, b, c]: [f32; 3], [d, e, f]: [f32; 3], fc: f32) -> [f32; 3] {
+    [a + (d - a) * fc, b + (e - b) * fc, c + (f - c) * fc]
+}
 
 pub struct Grapher {
     pub buffer: Vec<u8>,
