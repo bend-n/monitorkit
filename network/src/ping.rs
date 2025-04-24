@@ -24,7 +24,7 @@ use termion::raw::IntoRawMode;
 use termion::screen::IntoAlternateScreen;
 use termion::{async_stdin, clear, cursor, style};
 fn ping(x: IpAddr) -> Result<u32> {
-    match ping_rs::send_ping(&x, Duration::from_secs(2), b"", None) {
+    match ping_rs::send_ping(&x, Duration::from_secs(60), b"", None) {
         Rok(x) => Ok(x.rtt),
         Err(PingError::TimedOut | PingError::IoPending) => Ok(!0),
         Err(x) => bail!("{x:?}"),
@@ -48,20 +48,6 @@ fn main() -> Result<()> {
     let [mut max, mut sum, mut points, mut dropped] = [0; _];
     let mut min = !0;
 
-    let (tx, rx) = std::sync::mpsc::channel::<u32>();
-    let (ftx, frx) = oneshot::channel::<()>();
-    std::thread::spawn(move || {
-        let result = ping(ip).unwrap();
-        tx.send(result).unwrap();
-        _ = ftx.send(());
-        loop {
-            std::thread::sleep(Duration::from_millis(100u64.saturating_sub(result as _)));
-            let result = ping(ip).unwrap();
-            tx.send(result).unwrap();
-        }
-    });
-    frx.recv()?;
-
     let mut g = Grapher::new()?;
 
     let mut stdout = stdout().into_raw_mode()?.into_alternate_screen()?;
@@ -75,23 +61,20 @@ fn main() -> Result<()> {
                 _ => (),
             }
         }
-
-        let r = rx.try_recv();
-        if let Rok(r) = r
-            && r != !0
-        {
-            sum += r;
-            points += 1;
-            min = min.min(r);
-            max = max.max(r);
-        } else {
-            dropped += 1;
-        }
+        let r = match ping(ip) {
+            Rok(u32::MAX) | Err(_) => {
+                dropped += 1;
+                sum / points
+            }
+            Rok(r) => {
+                sum += r;
+                points += 1;
+                min = min.min(r);
+                max = max.max(r);
+                r
+            }
+        };
         let avg = sum / points;
-        let mut r = r.unwrap_or(avg);
-        if r == !0 {
-            r = avg;
-        }
 
         let dat = g.data.iter().copied().filter(|&x| x != 0.0);
         let sum = dat
@@ -126,7 +109,7 @@ fn main() -> Result<()> {
         stdout.write_all(&g.buffer)?;
         stdout.flush()?;
 
-        sleep(Duration::from_millis(100));
+        sleep(Duration::from_millis(r.saturating_sub(100) as u64));
     }
     println!("\x1B[?7l");
     Ok(())
