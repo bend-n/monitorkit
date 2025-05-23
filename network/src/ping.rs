@@ -24,7 +24,7 @@ use termion::raw::IntoRawMode;
 use termion::screen::IntoAlternateScreen;
 use termion::{async_stdin, clear, cursor, style};
 fn ping(x: IpAddr) -> Result<u32> {
-    match ping_rs::send_ping(&x, Duration::from_secs(60), b"", None) {
+    match ping_rs::send_ping(&x, Duration::from_secs(2), b"", None) {
         Rok(x) => Ok(x.rtt),
         Err(PingError::TimedOut | PingError::IoPending) => Ok(!0),
         Err(x) => bail!("{x:?}"),

@@ -17,21 +17,32 @@ use termion::screen::IntoAlternateScreen;
 use termion::{async_stdin, clear, cursor, style};
 #[implicit_fn::implicit_fn]
 fn main() -> Result<()> {
-    let up = match std::env::args().nth(1) {
+    let file = match std::env::args().nth(1) {
         None => {
-            eprintln!("no args!");
+            let fs = std::fs::read_dir("/sys/class/net")?
+                .filter_map(Result::ok)
+                .filter_map(_.file_name().into_string().ok())
+                .collect::<Vec<_>>();
+            eprintln!("no network specified. must be one of {fs:?};\nnet [INTERFACE] [u/d]");
             exit(1)
         }
-        Some("dl" | "download" | "d" | "down") => false,
-        Some("up" | "upload") => true,
+        Some(x) => x,
+    };
+    let up = match std::env::args().nth(2) {
+        None => {
+            eprintln!("no args!\n;net [i] [up/down]");
+            exit(1)
+        }
+        Some("dl" | "download" | "r" | "d" | "down") => false,
+        Some("u" | "t" | "up" | "upload") => true,
         Some(x) => {
-            println!("{x} is not an arg, requires net");
+            println!("{x} is not an arg, requires up/down");
             exit(1)
         }
     };
-    let file = std::fs::read_dir("/sys/class/net/")?
+    let file = std::fs::read_dir("/sys/class/net")?
         .filter_map(Result::ok)
-        .find(|x| x.file_name().as_bytes().starts_with(b"lo").not())
+        .find(_.file_name().to_string_lossy().starts_with(&file))
         .ok_or(anyhow!("no network"))?;
 
     let pciid = read(file.path().join("device").join("uevent"))?
