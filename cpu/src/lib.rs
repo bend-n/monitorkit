@@ -1,11 +1,4 @@
-#![feature(
-    let_chains,
-    iter_array_chunks,
-    array_chunks,
-    generic_const_exprs,
-    portable_simd,
-    iter_chain
-)]
+#![feature(iter_array_chunks, generic_const_exprs, portable_simd)]
 use anyhow::*;
 use atools::prelude::*;
 use collar::CollectArray;

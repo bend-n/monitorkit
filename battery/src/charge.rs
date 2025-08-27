@@ -1,12 +1,8 @@
 #![feature(
-    generic_arg_infer,
     import_trait_associated_functions,
     string_deref_patterns,
-    let_chains,
     iter_array_chunks,
-    array_chunks,
-    portable_simd,
-    iter_chain
+    portable_simd
 )]
 use anyhow::*;
 use grapher::{truncwrite, Grapher};

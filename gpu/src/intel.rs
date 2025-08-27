@@ -1,14 +1,10 @@
 #![feature(
-    generic_arg_infer,
     import_trait_associated_functions,
     string_deref_patterns,
     deref_patterns,
-    let_chains,
     iter_array_chunks,
-    array_chunks,
     generic_const_exprs,
-    portable_simd,
-    iter_chain
+    portable_simd
 )]
 use anyhow::*;
 use collar::CollectArray as _;

@@ -1,12 +1,6 @@
-#![feature(
-    let_chains,
-    iter_array_chunks,
-    array_chunks,
-    portable_simd,
-    iter_chain,
-    round_char_boundary
-)]
+#![feature(iter_array_chunks, portable_simd, round_char_boundary)]
 use anyhow::Result;
+use array_chunks::*;
 use std::collections::VecDeque;
 use std::io::Write;
 use std::iter::zip;

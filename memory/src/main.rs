@@ -1,4 +1,4 @@
-#![feature(let_chains, iter_array_chunks, array_chunks, portable_simd, iter_chain)]
+#![feature(iter_array_chunks, portable_simd)]
 use anyhow::{Context, Result};
 use comat::cwrite;
 use grapher::Grapher;

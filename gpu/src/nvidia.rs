@@ -1,12 +1,4 @@
-#![feature(
-    generic_arg_infer,
-    import_trait_associated_functions,
-    let_chains,
-    iter_array_chunks,
-    array_chunks,
-    portable_simd,
-    iter_chain
-)]
+#![feature(import_trait_associated_functions, iter_array_chunks, portable_simd)]
 use anyhow::*;
 use grapher::inter;
 use grapher::truncwrite;

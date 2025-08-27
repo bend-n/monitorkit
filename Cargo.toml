@@ -11,6 +11,10 @@ members = [
 ]
 resolver = "3"
 
+[workspace.dependencies]
+array_chunks = "0.1.0"
+implicit-fn = "0.1.0"
+
 [profile.release]
 debug = 2
 opt-level = 3
